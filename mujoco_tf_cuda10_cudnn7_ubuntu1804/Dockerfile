@@ -23,19 +23,11 @@ RUN apt-get update -q \
     xserver-xorg-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-##================ CUDA-Driver install==================
-#RUN wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
-#RUN mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
-#RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
-#RUN add-apt-repository "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/ /"
-#RUN apt-get update
-#RUn apt-get -y install cuda-drivers
 
 #================ Docker install==================
 RUN apt-get install -y apt-transport-https ca-certificates curl software-properties-common
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
 RUN apt-key fingerprint 0EBFCD88
-#RUN add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
 RUN add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
    $(lsb_release -cs) \
@@ -45,23 +37,9 @@ RUN apt-get install -y docker-ce
 RUN apt-get install -y docker-ce-cli
 RUN apt-get install -y containerd.io
 
-##================ nvidia-container-toolkit install==================
-#RUN apt-get install -y ubuntu-drivers-common && ubuntu-drivers autoinstall
-
-#RUN curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | apt-key add -
-#RUN distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-#RUN curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | tee /etc/apt/sources.list.d/nvidia-container-runtime.list
-#RUN apt-get update
-
-
-#RUN apt-get -y update && apt-get install -y nvidia-container-toolkit
-#RUN systemctl restart docker
-
-
 #================ others ==================
 RUN DEBIAN_FRONTEND=noninteractive add-apt-repository --yes ppa:deadsnakes/ppa && apt-get update
 RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.5-dev python3.5 python3-pip
-#RUN DEBIAN_FRONTEND=noninteractive apt-get install --yes python3.7-dev python3.7 python3-pip
 RUN virtualenv --python=python3.5 env
 
 RUN rm /usr/bin/python
@@ -82,35 +60,17 @@ COPY ./mjkey.txt /root/.mujoco/
 ENV LD_LIBRARY_PATH /root/.mujoco/mjpro150/bin:${LD_LIBRARY_PATH}
 ENV LD_LIBRARY_PATH /usr/local/nvidia/lib64:${LD_LIBRARY_PATH}
 
-#COPY vendor/Xdummy /usr/local/bin/Xdummy
-#RUN chmod +x /usr/local/bin/Xdummy
-
-# Workaround for https://bugs.launchpad.net/ubuntu/+source/nvidia-graphics-drivers-375/+bug/1674677
-#COPY ./vendor/10_nvidia.json /usr/share/glvnd/egl_vendor.d/10_nvidia.json
-
-# [TODO] confirm whether its ok to remove
-#RUN apt-get update && apt-get install -y libav-tools
-
-# For some reason this works despite an error showing up...
-#RUN DEBIAN_FRONTEND=noninteractive apt-get -qy install nvidia-384; exit 0
-#ENV LD_LIBRARY_PATH ${LD_LIBRARY_PATH}:/usr/lib/nvidia-384
-
 RUN mkdir /root/code
 WORKDIR /root/code
 WORKDIR /mujoco_py
 RUN pip install --upgrade pip
 
-# For atari-py
 RUN apt-get install -y zlib1g-dev swig cmake
-#RUN apt-get install -y swig
-#RUN pip install zlib1g-dev
-#RUN pip install swig
-#RUN pip install cmake
 
-# Previous versions installed from a requirements.txt, but direct pip
 # install seems cleaner
 RUN pip install glfw>=1.4.0
-RUN pip install numpy>=1.11
+#RUN pip install numpy>=1.11
+RUN pip install numpy
 RUN pip install Cython>=0.27.2
 RUN pip install imageio>=2.1.2
 RUN pip install cffi>=1.10
@@ -143,6 +103,6 @@ RUN apt-get -y update
 RUN apt-get -y upgrade
 RUN apt-get install -y python3-pip
 RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev
-RUN pip3 install python-binance
-
-
+#RUN pip3 install python-binance
+RUN pip install colorlog
+RUN pip install pandas
